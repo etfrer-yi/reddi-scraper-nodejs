@@ -11,15 +11,18 @@ const path = require('path');
 	const createWindow = () => {
 		const win = new BrowserWindow({
 			width: 800,
-			height: 600,
+			height: 800,
 			webPreferences: {
+				nodeIntegration: true,
 				preload: path.join(__dirname, 'preload.js')
 			}
 		})
 
-		ipcMain.on('formSubmission', (event, data) => {
-			const {subredditName, filterParams } = data;
-			puppeteerSetup(subredditName, filterParams)
+		ipcMain.on('formSubmission', async (event, data) => {
+			event.sender.send("webScraping")
+			const { subredditName, filterParams } = data;
+			const wordCounts = await puppeteerSetup(subredditName, filterParams)
+			event.sender.send("finishScraping", wordCounts)
 		})
 	
 		win.loadFile('index.html')
@@ -47,7 +50,7 @@ const path = require('path');
  */
 async function puppeteerSetup(subredditName, filterParams) {
 	try {
-		const URL = `https://www.reddit.com/r/${subredditName}/${filterParams}/`
+		const URL = `https://www.reddit.com/r/${subredditName}/${filterParams}`
 		const browser = await puppeteer.launch()
 
 		const page = await browser.newPage()
@@ -60,12 +63,16 @@ async function puppeteerSetup(subredditName, filterParams) {
 			concatenatedPostContent: ""
 		}
 
-		allPosts.concatenatedPostTitles += await printPosts(page, "div[slot='title']")
-		allPosts.concatenatedPostContent += await printPosts(page, "div[slot='text-body'] p")
+		// allPosts.concatenatedPostTitles += await getPostsInfo(page, "div[slot='title']")
+		// allPosts.concatenatedPostContent += await getPostsInfo(page, "div[slot='text-body'] p")
 
-		console.log(allPosts)
+		allPosts.concatenatedPostTitles += await getPostsInfo(page, "h3")
+		allPosts.concatenatedPostContent += await getPostsInfo(page, "p")
 
 		await browser.close()
+		return new Promise((resolve, reject) => {
+			resolve(allPosts)
+		})
 	} catch (error) {
 		console.error(error)
 	}
@@ -80,20 +87,19 @@ async function autoScroll(page){
 						window.scrollBy(0, distance)
 
 						if(document.body.scrollHeight >= 15000){
-								clearInterval(timer)
-								resolve()
+							clearInterval(timer)
+							resolve()
 						}
 				}, 10)
 			})
 	})
 }
 
-async function printPosts(page, query) {
+async function getPostsInfo(page, query) {
 	let concat_result = ""
 	const postInfos = await page.$$(query)
 	for (const postInfo of postInfos) {
 		concat_result += " " + await postInfo.evaluate(x => x.innerText )
 	}
-	console.log(concat_result)
 	return concat_result
 }

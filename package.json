@@ -10,10 +10,11 @@
   "author": "Yi Heng Wang",
   "license": "ISC",
   "dependencies": {
-    "prompt-sync": "^4.2.0",
-    "puppeteer": "^21.1.0"
+    "d3": "7.8.5",
+    "d3-node": "^3.0.0",
+    "puppeteer": "21.1.0"
   },
   "devDependencies": {
-    "electron": "^26.0.0"
+    "electron": "26.0.0"
   }
 }
