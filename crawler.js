@@ -1,24 +1,33 @@
 const puppeteer = require('puppeteer')
-const prompt = require("prompt-sync")({ sigint: true });
+const prompt = require("prompt-sync")({ sigint: true })
 
-const subreddit = prompt("What subreddit would you like to query for? ");
+const subreddit = prompt("What subreddit would you like to query for? ")
 
 async function autoScroll(page){
 	await page.evaluate(async () => {
 			await new Promise((resolve) => {
-					// let totalHeight = 0;
-					const distance = 100;
+					const distance = 100
 					const timer = setInterval(() => {
-						window.scrollBy(0, distance);
-						// totalHeight += distance;
+						window.scrollBy(0, distance)
 
 						if(document.body.scrollHeight >= 15000){
 								clearInterval(timer)
 								resolve()
 						}
-				}, 100);
-			});
-	});
+				}, 10)
+			})
+	})
+}
+
+async function printPosts(page, query) {
+	// const results = []
+	let concat_result = "";
+	const postInfos = await page.$$(query)
+	for (const postInfo of postInfos) {
+		concat_result += "\n" + await postInfo.evaluate(x => x.innerText );
+		// results.push(await postInfo.evaluate(x => x.innerText ))
+	}
+	return concat_result;
 }
 
 async function getVisual() {
@@ -33,15 +42,13 @@ async function getVisual() {
 
 		await autoScroll(page)
 
-		const results = [];
-		const postContents = await page.$$("p")
-		for(let postContent of postContents) {
-			results.push(await postContent.evaluate(x => x.textContent));
-		}
+		let concat_result = ""
 
-		console.log(results)
+		concat_result += await printPosts(page, "div[slot='title']")
+		concat_result += await printPosts(page, "div[slot='text-body'] p")
 
-		
+		console.log(concat_result)
+
 		await browser.close()
 	} catch (error) {
 		console.error(error)
