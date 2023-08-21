@@ -1,15 +1,19 @@
 {
   "name": "reddit-web-scraper",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Node.js project with GUI that crawls a subreddit and generates infographics basd on it",
+  "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
   },
-  "author": "",
+  "author": "Yi Heng Wang",
   "license": "ISC",
   "dependencies": {
     "prompt-sync": "^4.2.0",
     "puppeteer": "^21.1.0"
+  },
+  "devDependencies": {
+    "electron": "^26.0.0"
   }
 }
