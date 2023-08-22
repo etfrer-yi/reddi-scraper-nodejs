@@ -10,7 +10,7 @@ if (submitButton) {
   })
 }
 
-window.electronAPI.setLoadingScreen((event, value) => {
+window.electronAPI.setPage((event, value) => {
   const {file, allPosts} = value;
   window.location.href = file
 })
