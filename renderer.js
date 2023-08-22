@@ -1,20 +1,16 @@
 const submitButton = document.getElementById('btn')
 
-submitButton.addEventListener('click', () => {
-  const formData = {
-    subredditName: document.getElementById('subreddit').value,
-    filterParams: document.getElementById("filterParams").value
-  }
-  window.electronAPI.setSubredditInfo(formData)
-  // const spinner = "<div class='loader'></div>";
-  // const root = document.getElementById("root");
-  // root.innerHTML = spinner;
-})
+if (submitButton) {
+  submitButton.addEventListener('click', async () => {
+    const formData = {
+      subredditName: document.getElementById('subreddit').value,
+      filterParams: document.getElementById("filterParams").value
+    }
+    window.electronAPI.setSubredditInfo(formData)
+  })
+}
 
 window.electronAPI.setLoadingScreen((event, value) => {
-  location.href='loading.html'
-})
-
-window.electronAPI.setWordCounts((event, value) => {
-  location.href='graphics.html'
+  const {file, allPosts} = value;
+  window.location.href = file
 })

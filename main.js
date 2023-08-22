@@ -4,12 +4,14 @@ const puppeteer = require('puppeteer');
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 
+let win;
+
 /**
  * Handles setting up the Electron.js 
  */
 (function electronSetup() {
-	const createWindow = () => {
-		const win = new BrowserWindow({
+	const createWindow = (fname) => {
+		win = new BrowserWindow({
 			width: 800,
 			height: 800,
 			webPreferences: {
@@ -17,19 +19,19 @@ const path = require('path');
 				preload: path.join(__dirname, 'preload.js')
 			}
 		})
-
-		ipcMain.on('formSubmission', async (event, data) => {
-			event.sender.send("webScraping")
-			const { subredditName, filterParams } = data;
-			const wordCounts = await puppeteerSetup(subredditName, filterParams)
-			event.sender.send("finishScraping", wordCounts)
-		})
 	
-		win.loadFile('index.html')
+		win.loadFile(fname)
 	}
+
+	ipcMain.handle('formSubmission', async (event, data) => {
+		event.sender.send("webScraping", {file: "loading.html"})
+		const { subredditName, filterParams } = data;
+		const allPosts = await puppeteerSetup(subredditName, filterParams)
+		event.sender.send("webScraping", {file: "graphics.html", allPosts: allPosts})
+	})
 	
 	app.whenReady().then(() => {
-		createWindow()
+		createWindow('index.html')
 	
 		app.on('activate', () => {
 			if (BrowserWindow.getAllWindows().length === 0) {
@@ -70,9 +72,7 @@ async function puppeteerSetup(subredditName, filterParams) {
 		allPosts.concatenatedPostContent += await getPostsInfo(page, "p")
 
 		await browser.close()
-		return new Promise((resolve, reject) => {
-			resolve(allPosts)
-		})
+		return allPosts
 	} catch (error) {
 		console.error(error)
 	}

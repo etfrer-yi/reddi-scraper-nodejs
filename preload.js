@@ -1,7 +1,6 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  setSubredditInfo: (data) => ipcRenderer.send('formSubmission', data),
-  setLoadingScreen: (callback) => ipcRenderer.on('webScraping', callback),
-  setWordCounts: (callback) => ipcRenderer.on('finishScraping', callback)
+  setSubredditInfo: (data) => ipcRenderer.invoke('formSubmission', data),
+  setPage: (callback) => ipcRenderer.on('webScraping', callback),
 })
