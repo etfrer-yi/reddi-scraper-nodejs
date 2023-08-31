@@ -11,6 +11,7 @@ if (submitButton) {
 }
 
 window.electronAPI.setPage((event, value) => {
-  const {file, allPosts} = value;
-  window.location.href = file
+  const {content} = value;
+  const root = document.getElementById("root")
+  root.innerHTML = content
 })

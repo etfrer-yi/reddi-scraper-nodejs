@@ -1,4 +1,6 @@
 // TODO: how many posts am I getting exacly?
+// const D3Node = require('d3-node')
+// const d3n = new D3Node()
 
 const puppeteer = require('puppeteer');
 const { app, BrowserWindow, ipcMain } = require('electron');
@@ -24,10 +26,10 @@ let win;
 	}
 
 	ipcMain.handle('formSubmission', async (event, data) => {
-		event.sender.send("webScraping", {file: "loading.html"})
+		event.sender.send("webScraping", {content: "<div id='root' class='loader'/>"})
 		const { subredditName, filterParams } = data;
 		const allPosts = await puppeteerSetup(subredditName, filterParams)
-		event.sender.send("webScraping", {file: "graphics.html", allPosts: allPosts})
+		event.sender.send("webScraping", {content: "<div id='root'/>"})
 	})
 	
 	app.whenReady().then(() => {
@@ -35,7 +37,7 @@ let win;
 	
 		app.on('activate', () => {
 			if (BrowserWindow.getAllWindows().length === 0) {
-				createWindow()
+				createWindow('index.html')
 			}
 		})
 	})

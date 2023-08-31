@@ -14,24 +14,26 @@
     <title>Subreddit Information Selection</title>
     <link rel="stylesheet" href="./styles.css">
   </head>
-  <body id="root">
-    <form id="reddit-info-form">
-      <label for="subreddit">Which subreddit would you like to query?</label><br>
-      <input type="text" id="subreddit" name="subreddit"><br>
+  <body>
+    <div id="root">
+      <form id="reddit-info-form">
+        <label for="subreddit">Which subreddit would you like to query?</label><br>
+        <input type="text" id="subreddit" name="subreddit"><br>
 
-      <label for="filterParams">Which subreddit would you like to query?</label><br>
-      <select id="filterParams" name="filterParams">
-        <option value="hot">Hot</option>
-        <option value="new">New</option>
-        <option value="top/?t=hour">Now</option>
-        <option value="top/?t=day">Today</option>
-        <option value="top/?t=week">This Week</option>
-        <option value="top/?t=month">This Month</option>
-        <option value="top/?t=year">This Year</option>
-        <option value="top/?t=all">All Time</option>
-      </select>
-    </form>
-    <button type="submit" id="btn" form="reddit-info-form" value="Submit">Submit</button>
+        <label for="filterParams">Which subreddit would you like to query?</label><br>
+        <select id="filterParams" name="filterParams">
+          <option value="hot">Hot</option>
+          <option value="new">New</option>
+          <option value="top/?t=hour">Now</option>
+          <option value="top/?t=day">Today</option>
+          <option value="top/?t=week">This Week</option>
+          <option value="top/?t=month">This Month</option>
+          <option value="top/?t=year">This Year</option>
+          <option value="top/?t=all">All Time</option>
+        </select>
+      </form>
+      <button type="submit" id="btn" form="reddit-info-form"  value="Submit">Submit</button>
+    </div>
     <script src="./renderer.js"></script>
   </body>
 </html>
