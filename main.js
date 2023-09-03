@@ -1,5 +1,6 @@
-// TODO: how many posts am I getting exacly?
-// https://stackoverflow.com/questions/44932154/how-to-open-update-electron-browser-window-with-a-new-html-file
+/* TODO: how many posts am I getting exacly?
+
+*/
 const D3Node = require('d3-node')
 
 const puppeteer = require('puppeteer');
@@ -31,11 +32,11 @@ let win;
 		const postTitleWordCounts = wordCountSetup(allPosts.concatenatedPostTitles)
 		const postContentWordCounts = wordCountSetup(allPosts.concatenatedPostContent)
 		const allWordCounts = wordCountSetup(allPosts.concatenatedPostContent + " " + allPosts.concatenatedPostTitles)
-		const titleChart = chartSetup(postTitleWordCounts, "titleWordCounts", "Title Word Counts")
-		const contentChart = chartSetup(postContentWordCounts, "contentWordCounts", "Content Word Counts")
-		const allWordsChart = chartSetup(allWordCounts, "allWordCounts", "All WordCounts")
-		const allWordsWdCloud = wordCloudSetup(allWordCounts)
-		event.sender.send("webScraping", allWordsChart + titleChart + contentChart)
+		const titleChart = chartSetup(postTitleWordCounts, "titleWordCounts", "Post Title Word Counts")
+		const contentChart = chartSetup(postContentWordCounts, "contentWordCounts", "Post Content Word Counts")
+		const allWordsChart = chartSetup(allWordCounts, "allWordCounts", "All Word Counts")
+		// const allWordsWdCloud = wordCloudSetup(allWordCounts)
+		event.sender.send("webScraping",  titleChart + contentChart + allWordsChart)
 	})
 	
 	app.whenReady().then(() => {
@@ -77,9 +78,9 @@ function wordCountSetup(allWords) {
  */
 function chartSetup(wordCounts, chartId, chartTitle) {
 	const options = { selector: `#${chartId}`, container: `<div id="container"><div id="${chartId}"></div></div>` }
-	const margin = {top: 20, bottom: 20}
-  const width = 350
-  const height = 200 - margin.top - margin.bottom;
+	const margin = {top: 50, bottom: 50, left: 50, right: 50}
+  const width = 300 - margin.left - margin.right;
+  const height = 280 - margin.top - margin.bottom;
 
 	let data = Object.entries(wordCounts).map(([word, frequency]) => ({ word, frequency }));
 	data.sort(compareFn)
@@ -136,12 +137,65 @@ function chartSetup(wordCounts, chartId, chartTitle) {
 		.attr("y", function(d) { return y(d.frequency); })
 
 	// Title
-	svg.append("svg:title").text(chartTitle)
+	svg.append("text")
+		.attr("x", (width / 2))             
+		.attr("y", 0 - (margin.top / 2))
+		.attr("text-anchor", "middle")  
+		.style("font-size", "16px") 
+		.text(chartTitle)
 
 	return d3n.html()
 }
 
-function wordCloudSetup() {}
+/**
+ * Generates a word cloud based on the 
+ */
+function wordCloudSetup(wordCounts) {
+	const options = { selector: `#wordCloud`, container: `<div id="container"><div id="wordCloud"></div></div>` }
+	const margin = {top: 10, bottom: 10, left: 50, right: 50}
+  const width = 360 - margin.left - margin.right;
+  const height = 240 - margin.top - margin.bottom;
+	const data = Object.entries(wordCounts).map(([word, frequency]) => ({ word, frequency }));
+	const d3n = new D3Node(options) // initializes D3 with container element
+	const d3 = d3n.d3
+
+	// Append the SVG
+	const svg = d3.select(d3n.document.querySelector(`#wordCloud`))
+		.append("svg")
+		.attr("width", width + margin.left + margin.right)
+		.attr("height", height + margin.top + margin.bottom)
+	.append("g")
+		.attr("transform",
+					"translate(" + margin.left + "," + margin.top + ")");
+
+	const layout = d3()
+		.size([width, height])
+		.words(data.map(function(d) { return {text: d.word, size:d.frequency}; }))
+		.padding(5)        //space between words
+		.rotate(function() { return ~~(Math.random() * 2) * 90; })
+		.fontSize(function(d) { return d.frequency; })      // font size of words
+		.on("end", draw);
+	layout.start();
+
+	function draw(words) {
+		svg
+			.append("g")
+				.attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+				.selectAll("text")
+					.data(words)
+				.enter().append("text")
+					.style("font-size", function(d) { return d.frequency; })
+					.style("fill", "#69b3a2")
+					.attr("text-anchor", "middle")
+					.style("font-family", "Impact")
+					.attr("transform", function(d) {
+						return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+					})
+					.text(function(d) { return d.text; });
+	}
+
+	return d3n.html()
+}
 
 
 /**
