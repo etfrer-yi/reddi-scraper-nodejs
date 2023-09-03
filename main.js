@@ -25,16 +25,17 @@ let win;
 	}
 
 	ipcMain.handle('formSubmission', async (event, data) => {
-		event.sender.send("webScraping", {content: "<div id='root' class='loader'/>"})
+		event.sender.send("webScraping", "<div id='root' class='loader'/>")
 		const { subredditName, filterParams } = data
 		const allPosts = await puppeteerSetup(subredditName, filterParams)
-		const postTitleWordCounts = wordCountSetup(allPosts.concatenatedPostTitles, "titleWordCounts", "Title Word Counts")
-		const postContentWordCounts = wordCountSetup(allPosts.concatenatedPostContent, "contentWordCounts", "Content Word Counts")
-		const allWordCounts = wordCountSetup(allPosts.concatenatedPostContent + " " + allPosts.concatenatedPostTitles, "allWordCounts", "All WordCounts")
-		const titleChart = chartSetup(postTitleWordCounts)
-		const contentChart = chartSetup(postContentWordCounts)
-		const allWordsChart = chartSetup(allWordCounts)
-		event.sender.send("webScraping", {content: allWordsChart + titleChart + contentChart})
+		const postTitleWordCounts = wordCountSetup(allPosts.concatenatedPostTitles)
+		const postContentWordCounts = wordCountSetup(allPosts.concatenatedPostContent)
+		const allWordCounts = wordCountSetup(allPosts.concatenatedPostContent + " " + allPosts.concatenatedPostTitles)
+		const titleChart = chartSetup(postTitleWordCounts, "titleWordCounts", "Title Word Counts")
+		const contentChart = chartSetup(postContentWordCounts, "contentWordCounts", "Content Word Counts")
+		const allWordsChart = chartSetup(allWordCounts, "allWordCounts", "All WordCounts")
+		const allWordsWdCloud = wordCloudSetup(allWordCounts)
+		event.sender.send("webScraping", allWordsChart + titleChart + contentChart)
 	})
 	
 	app.whenReady().then(() => {
@@ -76,9 +77,9 @@ function wordCountSetup(allWords) {
  */
 function chartSetup(wordCounts, chartId, chartTitle) {
 	const options = { selector: `#${chartId}`, container: `<div id="container"><div id="${chartId}"></div></div>` }
-	const margin = {top: 10, right: 30, bottom: 90, left: 40}
-  const width = 460 - margin.left - margin.right
-  const height = 450 - margin.top - margin.bottom;
+	const margin = {top: 20, bottom: 20}
+  const width = 400
+  const height = 440 - margin.top - margin.bottom;
 
 	let data = Object.entries(wordCounts).map(([word, frequency]) => ({ word, frequency }));
 	data.sort(compareFn)
@@ -104,7 +105,7 @@ function chartSetup(wordCounts, chartId, chartTitle) {
 		.append("g")
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
-		// Add X axis
+	// Add X axis
 	const x = d3.scaleBand()
 		.range([ 0, width ])
 		.domain(data.map(function(d) { return d.word; }))
@@ -139,6 +140,8 @@ function chartSetup(wordCounts, chartId, chartTitle) {
 
 	return d3n.html()
 }
+
+function wordCloudSetup() {}
 
 
 /**

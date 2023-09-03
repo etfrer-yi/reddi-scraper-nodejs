@@ -14,7 +14,5 @@ submitButton.addEventListener('click', async () => {
 })
 
 window.electronAPI.setPage((event, value) => {
-  console.log(value)
-  const {content} = value
-  getRoot().innerHTML = content
+  getRoot().innerHTML = value
 })
