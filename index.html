@@ -3,24 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta
+    <!-- <meta
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'"
     />
     <meta
       http-equiv="X-Content-Security-Policy"
       content="default-src 'self'; script-src 'self'"
-    />
+    /> -->
     <title>Subreddit Information Selection</title>
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
     <div id="root">
-      <form id="reddit-info-form">
         <label for="subreddit">Which subreddit would you like to query?</label><br>
         <input type="text" id="subreddit" name="subreddit"><br>
-
-        <label for="filterParams">Which subreddit would you like to query?</label><br>
+        
+        <label for="filterParams">What filter do you want?</label><br>
         <select id="filterParams" name="filterParams">
           <option value="hot">Hot</option>
           <option value="new">New</option>
@@ -31,7 +30,6 @@
           <option value="top/?t=year">This Year</option>
           <option value="top/?t=all">All Time</option>
         </select>
-      </form>
       <button type="submit" id="btn" form="reddit-info-form"  value="Submit">Submit</button>
     </div>
     <script src="./renderer.js"></script>
