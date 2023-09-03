@@ -14,8 +14,8 @@ let win;
 (function electronSetup() {
 	const createWindow = (fname) => {
 		win = new BrowserWindow({
-			width: 800,
-			height: 800,
+			width: 400,
+			height: 400,
 			webPreferences: {
 				preload: path.join(__dirname, 'preload.js')
 			}
@@ -78,8 +78,8 @@ function wordCountSetup(allWords) {
 function chartSetup(wordCounts, chartId, chartTitle) {
 	const options = { selector: `#${chartId}`, container: `<div id="container"><div id="${chartId}"></div></div>` }
 	const margin = {top: 20, bottom: 20}
-  const width = 400
-  const height = 440 - margin.top - margin.bottom;
+  const width = 350
+  const height = 200 - margin.top - margin.bottom;
 
 	let data = Object.entries(wordCounts).map(([word, frequency]) => ({ word, frequency }));
 	data.sort(compareFn)

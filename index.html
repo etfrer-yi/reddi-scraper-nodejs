@@ -17,10 +17,10 @@
   <body>
     <div id="root">
       <label for="subreddit">Which subreddit would you like to query?</label><br>
-      <input type="text" id="subreddit" name="subreddit" class="input"><br>
+      <input type="text" id="subreddit" name="subreddit" class="fullWidth"><br>
 
       <label for="filterParams">What filter do you want?</label><br>
-      <select id="filterParams" name="filterParams" class="input">
+      <select id="filterParams" name="filterParams" class="fullWidth">
         <option value="hot">Hot</option>
         <option value="new">New</option>
         <option value="top/?t=hour">Now</option>
@@ -31,7 +31,7 @@
         <option value="top/?t=all">All Time</option>
       </select>
     <br>
-    <button id="btn">Submit</button>
+    <button id="btn" class="fullWidth">Submit</button>
     </div>
     <script src="./renderer.js"></script>
   </body>

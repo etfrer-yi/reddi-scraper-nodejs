@@ -5,6 +5,14 @@ const getRoot = () => {
   return document.getElementById("root")
 }
 
+getRoot().addEventListener("keyup", function(event) {
+    event.preventDefault();
+    // 'Enter' key
+    if (event.keyCode === 13) {
+      submitButton.click();
+    }
+});
+
 submitButton.addEventListener('click', async () => {
   const formData = {
     subredditName: document.getElementById('subreddit').value,
