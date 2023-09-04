@@ -1,5 +1,6 @@
-/* TODO: how many posts am I getting exacly?
-
+/* TODO: 
+- how many posts am I getting exacly?
+- support filter by hour
 */
 const D3Node = require('d3-node')
 
@@ -216,11 +217,13 @@ async function puppeteerSetup(subredditName, filterParams) {
 			concatenatedPostContent: ""
 		}
 
-		// allPosts.concatenatedPostTitles += await getPostsInfo(page, "div[slot='title']")
-		// allPosts.concatenatedPostContent += await getPostsInfo(page, "div[slot='text-body'] p")
-
-		allPosts.concatenatedPostTitles += await getPostsInfo(page, "h3")
-		allPosts.concatenatedPostContent += await getPostsInfo(page, "p")
+		if ((filterParams.includes("top/?t") || filterParams.includes("new"))) {
+			allPosts.concatenatedPostTitles += await getPostsInfo(page, "div[slot='title']")
+			allPosts.concatenatedPostContent += await getPostsInfo(page, "div[slot='text-body'] p")
+		} else {
+			allPosts.concatenatedPostTitles += await getPostsInfo(page, "h3")
+			allPosts.concatenatedPostContent += await getPostsInfo(page, "p")
+		}
 
 		await browser.close()
 		return allPosts
