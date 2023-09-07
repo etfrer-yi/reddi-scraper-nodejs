@@ -1,6 +1,7 @@
 /* TODO: 
 - how many posts am I getting exacly?
 - support filter by hour
+- support error handling when the subreddit does not exist
 */
 const D3Node = require('d3-node')
 
@@ -9,6 +10,8 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 
 let win;
+
+const SUBREDDIT_NOT_FOUND = "Subreddit Not Found";
 
 /**
  * Handles setting up the Electron.js 
@@ -30,13 +33,34 @@ let win;
 		event.sender.send("webScraping", "<div id='root' class='loader'/>")
 		const { subredditName, filterParams } = data
 		const allPosts = await puppeteerSetup(subredditName, filterParams)
+		if (allPosts === SUBREDDIT_NOT_FOUND) {
+			event.sender.send("webScraping", 
+			`<p>No such subreddit exists. Please select again!</p>
+			<br>
+      <label for="subreddit">Which subreddit would you like to query?</label><br>
+      <input type="text" id="subreddit" name="subreddit" class="fullWidth"><br>
+
+      <label for="filterParams">What filter do you want?</label><br>
+      <select id="filterParams" name="filterParams" class="fullWidth">
+        <option value="hot">Hot</option>
+        <option value="new">New</option>
+        <option value="top/?t=day">Today</option>
+        <option value="top/?t=week">This Week</option>
+        <option value="top/?t=month">This Month</option>
+        <option value="top/?t=year">This Year</option>
+        <option value="top/?t=all">All Time</option>
+        <option value="rising">Rising</option>
+      </select>
+    <br>
+    <button id="btn" class="fullWidth">Submit</button>`)
+		return;
+		}
 		const postTitleWordCounts = wordCountSetup(allPosts.concatenatedPostTitles)
 		const postContentWordCounts = wordCountSetup(allPosts.concatenatedPostContent)
 		const allWordCounts = wordCountSetup(allPosts.concatenatedPostContent + " " + allPosts.concatenatedPostTitles)
 		const titleChart = chartSetup(postTitleWordCounts, "titleWordCounts", "Post Title Word Counts")
 		const contentChart = chartSetup(postContentWordCounts, "contentWordCounts", "Post Content Word Counts")
 		const allWordsChart = chartSetup(allWordCounts, "allWordCounts", "All Word Counts")
-		// const allWordsWdCloud = wordCloudSetup(allWordCounts)
 		event.sender.send("webScraping",  titleChart + contentChart + allWordsChart)
 	})
 	
@@ -148,56 +172,6 @@ function chartSetup(wordCounts, chartId, chartTitle) {
 	return d3n.html()
 }
 
-/**
- * Generates a word cloud based on the 
- */
-function wordCloudSetup(wordCounts) {
-	const options = { selector: `#wordCloud`, container: `<div id="container"><div id="wordCloud"></div></div>` }
-	const margin = {top: 10, bottom: 10, left: 50, right: 50}
-  const width = 360 - margin.left - margin.right;
-  const height = 240 - margin.top - margin.bottom;
-	const data = Object.entries(wordCounts).map(([word, frequency]) => ({ word, frequency }));
-	const d3n = new D3Node(options) // initializes D3 with container element
-	const d3 = d3n.d3
-
-	// Append the SVG
-	const svg = d3.select(d3n.document.querySelector(`#wordCloud`))
-		.append("svg")
-		.attr("width", width + margin.left + margin.right)
-		.attr("height", height + margin.top + margin.bottom)
-	.append("g")
-		.attr("transform",
-					"translate(" + margin.left + "," + margin.top + ")");
-
-	const layout = d3()
-		.size([width, height])
-		.words(data.map(function(d) { return {text: d.word, size:d.frequency}; }))
-		.padding(5)        //space between words
-		.rotate(function() { return ~~(Math.random() * 2) * 90; })
-		.fontSize(function(d) { return d.frequency; })      // font size of words
-		.on("end", draw);
-	layout.start();
-
-	function draw(words) {
-		svg
-			.append("g")
-				.attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
-				.selectAll("text")
-					.data(words)
-				.enter().append("text")
-					.style("font-size", function(d) { return d.frequency; })
-					.style("fill", "#69b3a2")
-					.attr("text-anchor", "middle")
-					.style("font-family", "Impact")
-					.attr("transform", function(d) {
-						return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
-					})
-					.text(function(d) { return d.text; });
-	}
-
-	return d3n.html()
-}
-
 
 /**
  * Handles web scraping Reddit posts using Puppeteer
@@ -209,6 +183,11 @@ async function puppeteerSetup(subredditName, filterParams) {
 
 		const page = await browser.newPage()
 		await page.goto(URL)
+		
+		const [notFoundMsg] = await page.$x("//div[contains(., 'This community may have been banned or the community name is incorrect.')]");
+		if (notFoundMsg) {
+			return SUBREDDIT_NOT_FOUND
+		}
 
 		await autoScroll(page)
 
