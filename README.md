@@ -18,6 +18,7 @@ This is a JavaScript project whose purpose is to draw insights about most common
 1. A web scraper in Puppeteer.js that grabs the subreddit post titles and post content from a specific subreddit using mock scrolling with scroll height at least 15000 (specified in the code).
 2. An Electron.js GUI that displays an interface for selecting the subreddit and the filters associated with the date range of posts' posting time.
 3. Visualization (bar graph) of most commonly used words through d3.js.
+
 The main insight from the final product is that most commonly used words are small pieces such as "a", "the", etc.
 
 # Demo
