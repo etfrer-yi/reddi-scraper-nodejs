@@ -13,6 +13,15 @@
 
 </div>
 
+<div align="center">
+
+![Electron Badge](https://img.shields.io/badge/Electron-47848F?logo=electron&logoColor=fff&style=for-the-badge)
+![Puppeteer Badge](https://img.shields.io/badge/Puppeteer-40B5A4?logo=puppeteer&logoColor=fff&style=for-the-badge)
+![D3.js Badge](https://img.shields.io/badge/D3.js-F9A03C?logo=d3dotjs&logoColor=fff&style=for-the-badge)
+![Node.js Badge](https://img.shields.io/badge/Node.js-393?logo=nodedotjs&logoColor=fff&style=for-the-badge)
+
+</div>
+
 # Introduction
 This is a JavaScript project whose purpose is to draw insights about most commonly used words on a specific subreddit. Originally, it was simply a scraper for such Reddit data, but it has evolved into a multi-component, multi-framework project. There are three distinct frameworks/elements to this *Node.js* project:
 1. A web scraper in *Puppeteer JS* that grabs the subreddit post titles and post content from a specific subreddit using mock scrolling with scroll height at least 15000 (specified in the code).
